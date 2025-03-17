@@ -1,0 +1,25 @@
+{
+  "name": "tz-articles",
+  "version": "1.0.0",
+  "description": "Проект представляет собой веб-приложение для управления статьями и комментариями. Backend реализован на Node.js с использованием Express и Sequelize для работы с базой данных PostgreSQL. Frontend реализован на Vue.js с использованием Vuex для управления состоянием и Vuetify для UI компонентов.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "eslint": "^9.22.0",
+    "prettier": "^3.5.3"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/VladimirRudenk0/tz-articles.git"
+  },
+  "keywords": [],
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/VladimirRudenk0/tz-articles/issues"
+  },
+  "homepage": "https://github.com/VladimirRudenk0/tz-articles#readme"
+}

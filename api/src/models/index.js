@@ -1,5 +1,5 @@
-const Article = require('./article');
-const Comment = require('./comment');
+const article = require('./article');
+const comment = require('./comment');
 
-Article.hasMany(Comment, { foreignKey: 'id_article' });
-Comment.belongsTo(Article, { foreignKey: 'id_article' });
+article.hasMany(comment, { foreignKey: 'id_article' });
+comment.belongsTo(article, { foreignKey: 'id_article' });

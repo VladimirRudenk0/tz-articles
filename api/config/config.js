@@ -5,7 +5,7 @@ const connectDB = async () => {
   return {
     development: {
       username: process.env.PGUSER,
-      password: process.env.PGPASSWORD || 'Spiridon_2017',
+      password: process.env.PGPASSWORD,
       database: process.env.PGDATABASE,
       host: process.env.PGHOST,
       port: process.env.PGPORT,
@@ -14,7 +14,7 @@ const connectDB = async () => {
     },
     test: {
       username: process.env.PGUSER,
-      password: process.env.PGPASSWORD || 'Spiridon_2017',
+      password: process.env.PGPASSWORD,
       database: process.env.PGDATABASE,
       host: process.env.PGHOST,
       port: process.env.PGPORT,
@@ -23,7 +23,7 @@ const connectDB = async () => {
     },
     production: {
       username: process.env.PGUSER,
-      password: process.env.PGPASSWORD || 'Spiridon_2017',
+      password: process.env.PGPASSWORD,
       database: process.env.PGDATABASE,
       host: process.env.PGHOST,
       port: process.env.PGPORT,

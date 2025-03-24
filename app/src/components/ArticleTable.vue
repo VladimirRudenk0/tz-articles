@@ -22,23 +22,39 @@
 </template>
 
 <script>
+import api from '../api/api';
+
 export default {
-  props: {
-    articles: {
-      type: Array,
-      required: true,
-    },
+  data() {
+    return {
+      articles: [],
+      loading: false,
+      error: null
+    };
+  },
+  async created() {
+    await this.loadArticles();
   },
   methods: {
-    viewArticle(id) {
-      this.$emit('view', id);
+    async loadArticles() {
+      this.loading = true;
+      try {
+        const response = await api.getArticles();
+        this.articles = response.data;
+      } catch (error) {
+        this.error = error.message;
+      } finally {
+        this.loading = false;
+      }
     },
-    editArticle(id) {
-      this.$emit('edit', id);
-    },
-    deleteArticle(id) {
-      this.$emit('delete', id);
-    },
-  },
+    async deleteArticle(id) {
+      try {
+        await api.deleteArticle(id);
+        this.articles = this.articles.filter(article => article.id !== id);
+      } catch (error) {
+        this.error = error.message;
+      }
+    }
+  }
 };
 </script>

@@ -10,36 +10,50 @@
 </template>
 
 <script>
+import api from '../api/api';
 import CommentList from './CommentList.vue';
 import AddComment from './AddComment.vue';
 
 export default {
-  components: {
-    CommentList,
-    AddComment,
-  },
+  components: { CommentList, AddComment },
   data() {
     return {
-      article: {},
+      article: null,
       comments: [],
+      loading: false
     };
   },
-  methods: {
-    editArticle() {
-      this.$emit('edit-article');
-    },
-    deleteArticle() {
-      this.$emit('delete-article');
-    },
-    addComment(comment) {
-      this.$emit('add-comment', comment);
-    },
-    editComment(id) {
-      this.$emit('edit-comment', id);
-    },
-    deleteComment(id) {
-      this.$emit('delete-comment', id);
-    },
+  async created() {
+    await this.loadData();
   },
+  methods: {
+    async loadData() {
+      this.loading = true;
+      try {
+        const articleId = this.$route.params.id;
+        const [articleRes, commentsRes] = await Promise.all([
+          api.getArticle(articleId),
+          api.getComments(articleId)
+        ]);
+        this.article = articleRes.data;
+        this.comments = commentsRes.data;
+      } catch (error) {
+        console.error(error);
+      } finally {
+        this.loading = false;
+      }
+    },
+    async addComment(commentData) {
+      try {
+        const response = await api.createComment({
+          ...commentData,
+          id_article: this.$route.params.id
+        });
+        this.comments.push(response.data);
+      } catch (error) {
+        console.error(error);
+      }
+    }
+  }
 };
 </script>

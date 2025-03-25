@@ -1,10 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'http://localhost:5000',
-  headers: {
-    'Content-Type': 'application/json'
-  }
+  baseURL: 'http://localhost:5000'
 });
 
 export default {
@@ -30,13 +27,12 @@ export default {
   createComment(comment) {
     return api.post('/comments', comment);
   },
-  updateComment(id, comment) {
-    return api.patch(`/comments/${id}`, comment);
-  },
   deleteComment(id) {
     return api.delete(`/comments/${id}`);
   },
   getCommentsAnalytics(dateFrom, dateTo) {
-    return api.get('/analytic/comments', { params: { dateFrom, dateTo } });
+    return api.get('/analytic/comments', {
+      params: { dateFrom, dateTo }
+    });
   }
 };

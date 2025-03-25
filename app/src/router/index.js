@@ -1,27 +1,30 @@
 import { createRouter, createWebHistory } from 'vue-router';
-import ArticleTable from '../components/ArticleTable.vue';
-import ArticleView from '../components/ArticleView.vue';
-import CommentAnalytics from '../components/CommentAnalytics.vue';
+import ArticlesView from '../views/ArticlesView.vue';
+import ArticleView from '../views/ArticleView.vue';
+import AnalyticsView from '../views/AnalyticsView.vue';
 
 const routes = [
   {
     path: '/',
-    component: ArticleTable,
+    name: 'articles',
+    component: ArticlesView
   },
   {
     path: '/article/:id',
+    name: 'article',
     component: ArticleView,
-    props: true,
+    props: true
   },
   {
     path: '/analytics',
-    component: CommentAnalytics,
-  },
+    name: 'analytics',
+    component: AnalyticsView
+  }
 ];
 
 const router = createRouter({
   history: createWebHistory(),
-  routes,
+  routes
 });
 
 export default router;

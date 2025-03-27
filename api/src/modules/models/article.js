@@ -1,5 +1,5 @@
 module.exports = (sequelize, DataTypes) => {
-    const Article = sequelize.define('article', {
+    const Article = sequelize.define('Article', {
         id: {
             type: DataTypes.INTEGER,
             primaryKey: true,
@@ -23,7 +23,9 @@ module.exports = (sequelize, DataTypes) => {
         }
     }, {
         tableName: 'article',
-        timestamps: true
+        timestamps: true,
+        createdAt: 'create_date',
+        updatedAt: 'modify_date'
     });
     return Article;
 }

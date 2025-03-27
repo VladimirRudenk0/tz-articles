@@ -27,7 +27,9 @@ module.exports = (sequelize, DataTypes) => {
         }
     }, {
         tableName: 'comment',
-        timestamps: true
+        timestamps: true,
+        createdAt: 'create_date',
+        updatedAt: 'modify_date'
     });
     return Comment;
 }

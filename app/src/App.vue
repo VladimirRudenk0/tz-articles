@@ -1,6 +1,6 @@
 <template>
   <v-app>
-    <v-app-bar>
+    <v-app-bar :color="$vuetify.theme.current.colors.header" dense>
       <v-btn to="/">Статьи</v-btn>
       <v-btn to="/analytics">Аналитика</v-btn>
     </v-app-bar>

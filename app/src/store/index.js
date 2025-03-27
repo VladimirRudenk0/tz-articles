@@ -1,10 +1,15 @@
 import { createStore } from 'vuex';
-import articles from './articles';
-import comments from './comments';
+import article from './article';
+import comment from './comment';
 
 export default createStore ({
   modules: {
-    articles,
-    comments
+    article,
+    comment
+  },
+  actions: {
+    showSnackbar({ commit }, payload) {
+      commit('SET_SNACKBAR', payload);
+    }
   }
 });

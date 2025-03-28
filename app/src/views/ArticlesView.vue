@@ -26,18 +26,22 @@
 
               <div class="comments-section">
                 <h4 class="mb-4">Комментарии</h4>
-                <div v-for="comment in getArticleComments(article.id)" :key="comment.id" class="comment-item">
-                  <div class="comment-header">
-                    <v-chip small color="grey lighten-3">
+                <div v-if="getArticleComments(article.id).length > 0">
+                  <div v-for="comment in getArticleComments(article.id)"
+                    :key="comment.id"
+                    class="comment-item">
+                    <div class="comment-header">
+                      <v-chip small color="grey lighten-3">
                       {{ formatDate(comment.create_date) }}
-                    </v-chip>
+                      </v-chip>
+                    </div>
+                    <p class="comment-text">{{ comment.text }}</p>
                   </div>
-                  <p class="comment-text">{{ comment.text }}</p>
                 </div>
-                <v-btn @click="viewArticle(article.id)" color="primary" class="mt-4">
-                  Подробнее
-                </v-btn>
+              <div v-else class="no-comments">
+                Пока нет комментариев
               </div>
+             </div>
             </v-card-text>
           </v-card>
         </v-col>
@@ -73,6 +77,9 @@ export default {
     ...mapActions('comment', ['getCommentsForArticle']),
 
     getArticleComments(articleId) {
+      if (!this.comments || !Array.isArray(this.comments)) {
+      return [];
+    }
       return this.comments.filter(c => c.id_article === articleId);
     },
 
@@ -132,13 +139,18 @@ export default {
   this.loading = true;
   try {
     await this.getAllArticles();
+
     if (this.articles.length > 0) {
-  await this.getCommentsForArticle(this.articles[0].id);
-  }
+      await Promise.all(
+        this.articles.map(article =>
+          this.getCommentsForArticle(article.id)
+        )
+      );
+    }
   } catch (error) {
-    console.error('Ошибка загрузки:', error);
+    console.error('Loading error:', error);
     this.$root.$emit('show-snackbar', {
-      message: 'Не удалось загрузить статьи',
+      message: 'Не удалось загрузить данные',
       color: 'error'
     });
   } finally {
@@ -190,5 +202,11 @@ export default {
   margin: 0;
   padding-left: 10px;
   color: #333;
+}
+
+.no-comments {
+  color: #999;
+  font-style: italic;
+  padding: 10px 0;
 }
 </style>

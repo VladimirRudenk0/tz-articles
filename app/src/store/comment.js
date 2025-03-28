@@ -1,9 +1,10 @@
 import api from '../api/api';
+import axios from 'axios';
 
 export default {
   namespaced: true,
   state: {
-    comment: [],
+    comments: [],
     analytics: []
   },
   mutations: {
@@ -17,11 +18,11 @@ export default {
   actions: {
     async getCommentsForArticle({ commit }, articleId) {
       try {
-        const comment = await api.getComments(articleId);
-        commit('SET_COMMENTS', comment);
+        const res = await axios.get(`/comments/article/${articleId}`)
+        commit('SET_COMMENTS', res.data)
       } catch (error) {
-        console.error('Failed to fetch comments:', error);
-        throw error;
+        console.error('Error fetching comments:', error)
+        throw error
       }
     },
 

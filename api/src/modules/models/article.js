@@ -22,8 +22,9 @@ module.exports = (sequelize, DataTypes) => {
             allowNull: false
         }
     }, {
+        schema: 'tz_articles',
         tableName: 'article',
-        timestamps: true,
+        timestamps: false,
         createdAt: 'create_date',
         updatedAt: 'modify_date'
     });

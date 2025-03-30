@@ -3,6 +3,7 @@ const cors = require('cors');
 const { sequelize } = require('./src/modules/models/index');
 
 const app = express();
+app.use(express.json());
 
 app.use((req, res, next) => {
   console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
@@ -23,13 +24,11 @@ app.use(cors({
   allowedHeaders: ['Content-Type']
 }));
 
-app.use(express.json());
-
 const articleRoutes = require('./src/modules/routes/articleRoutes');
 const commentRoutes = require('./src/modules/routes/commentRoutes');
 
-app.use('/article', articleRoutes);
-app.use('/comment', commentRoutes);
+app.use('/articles', articleRoutes);
+app.use('/comments', commentRoutes);
 
 app.use((err, req, res, next) => {
   console.error('Unhandled error:', err.stack);

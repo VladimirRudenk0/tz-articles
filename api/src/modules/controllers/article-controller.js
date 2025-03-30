@@ -1,4 +1,4 @@
-const { Article } = require('../../../src/modules/models/index');
+const { Article, Comment } = require('../models/index');
 
 exports.createArticle = async (req, res) => {
     try {
@@ -15,20 +15,20 @@ exports.createArticle = async (req, res) => {
     }
 };
 
-exports.getAllArticles = async (req, res, next) => {
-    console.log('Attempting to fetch articles...');
+exports.getAllArticles = async (req, res) => {
     try {
-      const articles = await Article.findAll();
-      console.log('Successfully fetched articles:', articles.length);
+      const articles = await Article.findAll({
+        include: [{
+          model: Comment,
+          as: 'comments'
+        }]
+      });
       res.json(articles);
     } catch (error) {
-      console.error('Error in getAllArticles:', {
-        message: error.message,
-        stack: error.stack
-      });
-      next(error);
+      console.error('DB Error:', error);
+      res.status(500).json({ error: error.message });
     }
-  };
+};
 
 exports.getArticleById = async (req, res) => {
     try {
@@ -51,7 +51,7 @@ exports.updateArticle = async (req, res) => {
             { where: { id: req.params.id } }
         );
         if (updated) {
-            const updatedArticle = await Article.findByPK(req.params.id);
+            const updatedArticle = await Article.findByPk(req.params.id);
             res.status(200).json(updatedArticle);
         } else {
             res.status(404).json({ error: error.message });

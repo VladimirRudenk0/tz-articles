@@ -19,7 +19,7 @@ api.interceptors.response.use(
 export default {
   async getArticles() {
     try {
-      const response = await api.get('/article');
+      const response = await api.get('/articles');
       return response.data;
     } catch (error) {
       console.error('Error fetching articles:', error);
@@ -29,7 +29,7 @@ export default {
 
   async getArticle(id) {
     try {
-      const response = await api.get(`/article/${id}`);
+      const response = await api.get(`/articles/${id}`);
       return response.data;
     } catch (error) {
       console.error(`Error fetching article ${id}:`, error);
@@ -39,7 +39,7 @@ export default {
 
   async createArticle(article) {
     try {
-      const response = await api.post('/article', article);
+      const response = await api.post('/articles', article);
       return response.data;
     } catch (error) {
       console.error('Error creating article:', error);
@@ -49,7 +49,7 @@ export default {
 
   async updateArticle(id, article) {
     try {
-      const response = await api.patch(`/article/${id}`, article);
+      const response = await api.put(`/articles/${id}`, article);
       return response.data;
     } catch (error) {
       console.error(`Error updating article ${id}:`, error);
@@ -67,13 +67,12 @@ export default {
     }
   },
 
-  async getComments(articleId = null) {
+  async getCommentsForArticle(articleId) {
     try {
-      const url = articleId ? `/comments/article/${articleId}` : '/comments';
-      const response = await api.get(url);
+      const response = await api.get(`/comments/article/${articleId}`);
       return response.data;
     } catch (error) {
-      console.error('Error fetching comments:', error);
+      console.error(`Error fetching comments for article ${articleId}:`, error);
       throw error;
     }
   },
@@ -100,7 +99,7 @@ export default {
 
   async getCommentsAnalytics(dateFrom, dateTo) {
     try {
-      const response = await api.get('/analytic/comments', {
+      const response = await api.get('/analytics/comments', {
         params: { dateFrom, dateTo }
       });
       return response.data;

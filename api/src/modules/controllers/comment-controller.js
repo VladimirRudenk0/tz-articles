@@ -1,4 +1,4 @@
-const { Comment } = require('../../../src/modules/models/index');
+const { Comment, Article } = require('../models/index');
 
 exports.createComment = async (req, res) => {
   try {
@@ -12,10 +12,16 @@ exports.createComment = async (req, res) => {
 
 exports.getCommentsByArticleId = async (req, res) => {
   try {
-    const comments = await Comment.findAll({ where: { id_article: req.params.id_article } });
+    const comments = await Comment.findAll({ 
+      where: { id_article: req.params.articleId }
+    });
     res.status(200).json(comments);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error('Error details:', error);
+    res.status(500).json({ 
+      error: 'Internal Server Error',
+      details: error.message 
+    });
   }
 };
 

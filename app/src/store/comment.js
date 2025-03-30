@@ -1,28 +1,42 @@
 import api from '../api/api';
-import axios from 'axios';
 
 export default {
   namespaced: true,
   state: {
-    comments: [],
-    analytics: []
+    commentsByArticle: {},
+    analytics: [],
+    loading: false,
+    error: null
   },
   mutations: {
-    SET_COMMENTS(state, comments) {
-      state.comments = comments;
+    SET_COMMENTS(state, { articleId, comments }) {
+      state.commentsByArticle = {
+        ...state.commentsByArticle,
+        [articleId]: comments
+      };
     },
     SET_ANALYTICS(state, analytics) {
       state.analytics = analytics;
+    },
+    SET_LOADING(state, isLoading) {
+      state.loading = isLoading;
+    },
+    SET_ERROR(state, error) {
+      state.error = error;
     }
   },
   actions: {
     async getCommentsForArticle({ commit }, articleId) {
+      commit('SET_LOADING', true);
+      commit('SET_ERROR', null);
       try {
-        const res = await axios.get(`/comments/article/${articleId}`)
-        commit('SET_COMMENTS', res.data)
+        const comments = await api.getCommentsForArticle(articleId);
+        commit('SET_COMMENTS', { articleId, comments });
       } catch (error) {
-        console.error('Error fetching comments:', error)
-        throw error
+        commit('SET_ERROR', error.message);
+        console.error('Ошибка загрузки комментариев:', error);
+      } finally {
+        commit('SET_LOADING', false);
       }
     },
 

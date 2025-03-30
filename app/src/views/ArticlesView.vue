@@ -60,12 +60,18 @@ export default {
     return {
       showEditDialog: false,
       editingArticle: null,
-      loading: false
+      localLoading: false
     };
   },
   computed: {
     ...mapState('article', ['articles']),
-    ...mapState('comment', ['comments'])
+    ...mapState('comment', ['commentsByArticle', 'loading', 'error']),
+
+    getArticleComments() {
+      return (articleId) => {
+        return this.commentsByArticle[articleId] || [];
+      };
+    }
   },
   methods: {
     ...mapActions('article', [
@@ -76,19 +82,8 @@ export default {
     ]),
     ...mapActions('comment', ['getCommentsForArticle']),
 
-    getArticleComments(articleId) {
-      if (!this.comments || !Array.isArray(this.comments)) {
-      return [];
-    }
-      return this.comments.filter(c => c.id_article === articleId);
-    },
-
     formatDate(date) {
       return new Date(date).toLocaleString('ru-RU');
-    },
-
-    viewArticle(id) {
-      this.$router.push(`/article/${id}`);
     },
 
     editArticle(article) {
@@ -97,7 +92,7 @@ export default {
     },
 
     async handleSubmit(articleData) {
-      this.loading = true;
+      this.localLoading = true;
       try {
         if (articleData.id) {
           await this.modifyArticle({
@@ -114,49 +109,43 @@ export default {
         await this.getAllArticles();
       } catch (error) {
         console.error('Ошибка сохранения:', error);
-        this.showError('Ошибка при сохранении статьи');
       } finally {
-        this.loading = false;
+        this.localLoading = false;
       }
     },
 
-    async removeArticleHandler(id) {
+    async deleteArticle(id) {
       if (confirm('Удалить статью?')) {
-        this.loading = true;
+        this.localLoading = true;
         try {
           await this.removeArticle(id);
           await this.getAllArticles();
         } catch (error) {
           console.error('Ошибка удаления:', error);
-          this.showError('Ошибка при удалении статьи');
         } finally {
-          this.loading = false;
+          this.localLoading = false;
         }
       }
-    },
+    }
   },
   async created() {
-  this.loading = true;
-  try {
-    await this.getAllArticles();
+    this.localLoading = true;
+    try {
+      await this.getAllArticles();
 
-    if (this.articles.length > 0) {
-      await Promise.all(
-        this.articles.map(article =>
-          this.getCommentsForArticle(article.id)
-        )
-      );
+      if (this.articles.length > 0) {
+        await Promise.all(
+          this.articles.map(article =>
+            this.getCommentsForArticle(article.id)
+          )
+        );
+      }
+    } catch (error) {
+      console.error('Ошибка загрузки:', error);
+    } finally {
+      this.localLoading = false;
     }
-  } catch (error) {
-    console.error('Loading error:', error);
-    this.$root.$emit('show-snackbar', {
-      message: 'Не удалось загрузить данные',
-      color: 'error'
-    });
-  } finally {
-    this.loading = false;
   }
-}
 };
 </script>
 

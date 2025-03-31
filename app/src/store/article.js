@@ -22,8 +22,9 @@ export default {
     },
     async addArticle({ dispatch }, article) {
       try {
-        await api.createArticle(article);
+        const response = await api.createArticle(article);
         await dispatch('getAllArticles');
+        return response;
       } catch (error) {
         console.error('Error adding article:', error);
         throw error;

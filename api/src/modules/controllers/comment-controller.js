@@ -12,18 +12,20 @@ exports.createComment = async (req, res) => {
 
 exports.getCommentsByArticleId = async (req, res) => {
   try {
-    const comments = await Comment.findAll({ 
-      where: { id_article: req.params.articleId }
-    });
-    res.status(200).json(comments);
+      const comments = await Comment.findAll({
+          where: { id_article: req.params.articleId },
+          order: [['create_date', 'ASC']]
+      });
+      res.status(200).json(comments);
   } catch (error) {
-    console.error('Error details:', error);
-    res.status(500).json({ 
-      error: 'Internal Server Error',
-      details: error.message 
-    });
+      console.error('Error details:', error);
+      res.status(500).json({ 
+          error: 'Internal Server Error',
+          details: error.message 
+      });
   }
 };
+
 
 exports.getCommentById = async (req, res) => {
   try {
@@ -45,8 +47,11 @@ exports.updateComment = async (req, res) => {
       { text, modify_date: new Date() },
       { where: { id: req.params.id } }
     );
+
     if (updated) {
-      const updatedComment = await Comment.findByPk(req.params.id);
+      const updatedComment = await Comment.findByPk(req.params.id, {
+        attributes: ['id', 'text', 'modify_date']
+      });
       res.status(200).json(updatedComment);
     } else {
       res.status(404).json({ error: 'Комментарий не найден' });

@@ -3,6 +3,20 @@ const cors = require('cors');
 const { sequelize } = require('./src/modules/models/index');
 
 const app = express();
+
+const corsOptions = {
+  origin: 'http://localhost:5173',
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+  credentials: true,
+  optionsSuccessStatus: 204,
+  preflightContinue: false
+};
+
+app.use(cors(corsOptions));
+
+app.options('*', cors());
+
 app.use(express.json());
 
 app.use((req, res, next) => {
@@ -17,12 +31,6 @@ sequelize.authenticate()
 sequelize.sync()
   .then(() => console.log('Models synced'))
   .catch(err => console.error('Sync error:', err));
-
-app.use(cors({
-  origin: 'http://localhost:5173',
-  methods: ['GET', 'POST', 'PATCH', 'DELETE'],
-  allowedHeaders: ['Content-Type']
-}));
 
 const articleRoutes = require('./src/modules/routes/articleRoutes');
 const commentRoutes = require('./src/modules/routes/commentRoutes');

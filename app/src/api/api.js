@@ -42,6 +42,9 @@ export default {
       const response = await api.post('/articles', article);
       return response.data;
     } catch (error) {
+      if (error.response?.status === 400) {
+        throw new Error('Заполните все обязательные поля');
+      }
       console.error('Error creating article:', error);
       throw error;
     }
@@ -49,7 +52,7 @@ export default {
 
   async updateArticle(id, article) {
     try {
-      const response = await api.put(`/articles/${id}`, article);
+      const response = await api.patch(`/articles/${id}`, article);
       return response.data;
     } catch (error) {
       console.error(`Error updating article ${id}:`, error);

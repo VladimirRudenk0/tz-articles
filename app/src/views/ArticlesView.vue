@@ -92,27 +92,39 @@ export default {
     },
 
     async handleSubmit(articleData) {
-      this.localLoading = true;
-      try {
-        if (articleData.id) {
-          await this.modifyArticle({
-            id: articleData.id,
-            data: {
-              name: articleData.name,
-              article_text: articleData.article_text
-            }
-          });
-        } else {
-          await this.addArticle(articleData);
-        }
-        this.showEditDialog = false;
-        await this.getAllArticles();
-      } catch (error) {
-        console.error('Ошибка сохранения:', error);
-      } finally {
-        this.localLoading = false;
+    this.localLoading = true;
+    try {
+      if (articleData.id) {
+        await this.modifyArticle({
+          id: articleData.id,
+          data: {
+            name: articleData.name,
+            article_text: articleData.article_text,
+            modify_date: articleData.modify_date
+          }
+        });
+      } else {
+        await this.addArticle({
+          name: articleData.name,
+          article_text: articleData.article_text,
+          modify_date: articleData.modify_date
+        });
       }
-    },
+      this.showEditDialog = false;
+      await this.getAllArticles();
+    } catch (error) {
+      let errorMessage = 'Ошибка сохранения';
+      if (error.response?.data?.error?.includes('notNull Violation')) {
+        errorMessage = 'Заполните все обязательные поля';
+      }
+      this.$store.dispatch('showSnackbar', {
+        text: errorMessage,
+        color: 'error'
+      });
+    } finally {
+      this.localLoading = false;
+    }
+  },
 
     async deleteArticle(id) {
       if (confirm('Удалить статью?')) {
@@ -152,6 +164,7 @@ export default {
 <style scoped>
 .article-card {
   transition: all 0.3s ease;
+  margin-top: 1em;
 }
 
 .article-card:hover {

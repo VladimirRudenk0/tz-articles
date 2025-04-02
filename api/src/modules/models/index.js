@@ -27,8 +27,16 @@ sequelize.authenticate()
 const Article = require('./article')(sequelize, Sequelize);
 const Comment = require('./comment')(sequelize, Sequelize);
 
-Article.hasMany(Comment, { foreignKey: 'id_article', as: 'comments' });
-Comment.belongsTo(Article, { foreignKey: 'id_article' });
+Article.hasMany(Comment, {
+  foreignKey: 'id_article',
+  as: 'comments',
+  onDelete: 'CASCADE'
+});
+Comment.belongsTo(Article, {
+  foreignKey: 'id_article',
+  as: 'article'
+});
+
 
 module.exports = {
   sequelize,

@@ -2,28 +2,29 @@ const { Article, Comment } = require('../models/index');
 
 exports.createArticle = async (req, res) => {
   try {
-    const { name, article_text } = req.body;
-    
-    if (!name || !article_text) {
-      return res.status(400).json({ 
-        error: 'Name and article_text are required' 
-      });
-    }
+      const { name, article_text } = req.body;
+      
+      if (!name || !name.trim() || !article_text || !article_text.trim()) {
+          return res.status(400).json({ 
+              error: 'Name and article_text are required and cannot be empty' 
+          });
+      }
 
-    const article = await Article.create({ 
-      name, 
-      article_text,
-      create_date: new Date(),
-      modify_date: new Date()
-    });
-    
-    res.status(201).json(article);
+      const article = await Article.create({ 
+          name: name.trim(), 
+          article_text: article_text.trim()
+      }, {
+          returning: true,
+          validate: true
+      });
+      
+      return res.status(201).json(article);
   } catch (error) {
-    console.error('Error creating article:', error);
-    res.status(500).json({ 
-      error: 'Internal Server Error',
-      details: process.env.NODE_ENV === 'development' ? error.message : null
-    });
+      console.error('Error creating article:', error);
+      return res.status(500).json({ 
+          error: 'Internal Server Error',
+          details: process.env.NODE_ENV === 'development' ? error.message : null
+      });
   }
 };
 
@@ -89,19 +90,28 @@ exports.updateArticle = async (req, res) => {
   exports.deleteArticle = async (req, res) => {
     const transaction = await sequelize.transaction();
     try {
-        await Comment.destroy({ where: { id_article: req.params.id } }, { transaction });
-
-        const deleted = await Article.destroy({ where: { id: req.params.id } }, { transaction });
-
-        if (deleted) {
-            await transaction.commit();
-            res.status(204).send();
-        } else {
-            await transaction.rollback();
-            res.status(404).json({ error: 'Статья не найдена' });
-        }
-    } catch (error) {
+      await Comment.destroy({ 
+        where: { id_article: req.params.id },
+        transaction 
+      });
+  
+      const deleted = await Article.destroy({ 
+        where: { id: req.params.id },
+        transaction 
+      });
+  
+      if (deleted) {
+        await transaction.commit();
+        res.status(204).send();
+      } else {
         await transaction.rollback();
-        res.status(500).json({ error: error.message });
+        res.status(404).json({ error: 'Статья не найдена' });
+      }
+    } catch (error) {
+      await transaction.rollback();
+      res.status(500).json({ 
+        error: 'Internal Server Error',
+        details: process.env.NODE_ENV === 'development' ? error.message : null
+      });
     }
 };

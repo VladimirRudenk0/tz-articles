@@ -42,7 +42,7 @@ export default {
 
     async addComment({ dispatch }, { articleId, comment }) {
       try {
-        await api.createComment({ ...comment, id_article: articleId });
+        await api.createComment({ ...comment, articleId });
         await dispatch('getCommentsForArticle', articleId);
       } catch (error) {
         console.error('Failed to add comment:', error);

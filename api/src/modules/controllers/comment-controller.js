@@ -3,10 +3,24 @@ const { Comment, Article } = require('../models/index');
 exports.createComment = async (req, res) => {
   try {
     const { text, id_article } = req.body;
-    const comment = await Comment.create({ text, id_article, create_date: new Date(), modify_date: new Date() });
+    
+    const article = await Article.findByPk(id_article);
+    if (!text || !id_article) {
+      return res.status(404).json({ error: 'Статья не найдена' });
+    }
+
+    const comment = await Comment.create({ 
+      text, 
+      id_article, 
+      create_date: new Date(), 
+      modify_date: new Date() 
+    });
     res.status(201).json(comment);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ 
+      error: 'Internal Server Error',
+      details: process.env.NODE_ENV === 'development' ? error.message : null
+    });
   }
 };
 

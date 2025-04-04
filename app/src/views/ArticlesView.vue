@@ -68,7 +68,7 @@
 
                 <add-comment
                   :articleId="article.id"
-                  @submit="addComment"
+                  @submit="handleAddComment"
                   class="mt-4"
                 />
               </div>
@@ -152,39 +152,39 @@ export default {
     },
 
     async handleSubmit(articleData) {
-    this.localLoading = true;
-    try {
-      if (articleData.id) {
-        await this.modifyArticle({
-          id: articleData.id,
-          data: {
+      this.localLoading = true;
+      try {
+        if (articleData.id) {
+          await this.modifyArticle({
+            id: articleData.id,
+            data: {
+              name: articleData.name,
+              article_text: articleData.article_text,
+              modify_date: articleData.modify_date
+            }
+          });
+        } else {
+          await this.addArticle({
             name: articleData.name,
             article_text: articleData.article_text,
             modify_date: articleData.modify_date
-          }
+          });
+        }
+        this.showEditDialog = false;
+        await this.getAllArticles();
+      } catch (error) {
+        let errorMessage = 'Ошибка сохранения';
+        if (error.response?.data?.error?.includes('notNull Violation')) {
+          errorMessage = 'Заполните все обязательные поля';
+        }
+        this.$store.dispatch('showSnackbar', {
+          text: errorMessage,
+          color: 'error'
         });
-      } else {
-        await this.addArticle({
-          name: articleData.name,
-          article_text: articleData.article_text,
-          modify_date: articleData.modify_date
-        });
+      } finally {
+        this.localLoading = false;
       }
-      this.showEditDialog = false;
-      await this.getAllArticles();
-    } catch (error) {
-      let errorMessage = 'Ошибка сохранения';
-      if (error.response?.data?.error?.includes('notNull Violation')) {
-        errorMessage = 'Заполните все обязательные поля';
-      }
-      this.$store.dispatch('showSnackbar', {
-        text: errorMessage,
-        color: 'error'
-      });
-    } finally {
-      this.localLoading = false;
-    }
-  },
+    },
 
     async deleteArticle(id) {
       if (confirm('Удалить статью?')) {
@@ -197,6 +197,37 @@ export default {
         } finally {
           this.localLoading = false;
         }
+      }
+    },
+
+    async handleAddComment(commentData) {
+      try {
+        await this.$store.dispatch('comment/addComment', {
+          text: commentData.text,
+          articleId: commentData.articleId
+        });
+        await this.getCommentsForArticle(commentData.articleId);
+        return true;
+      } catch (error) {
+        console.error('Ошибка добавления комментария:', error);
+        this.$store.dispatch('showSnackbar', {
+          text: 'Не удалось добавить комментарий',
+          color: 'error'
+        });
+        return false;
+      }
+    },
+
+    async updateComment() {
+      try {
+        await this.$store.dispatch('comment/updateComment', {
+          id: this.editingComment.id,
+          text: this.editingComment.text
+        });
+        await this.getCommentsForArticle(this.editingComment.id_article);
+        this.commentEditDialog = false;
+      } catch (error) {
+        console.error('Ошибка обновления комментария:', error);
       }
     }
   },
@@ -216,26 +247,6 @@ export default {
       console.error('Ошибка загрузки:', error);
     } finally {
       this.localLoading = false;
-    }
-  },
-  async addComment(commentData) {
-    try {
-      await this.addComment(commentData);
-      await this.getCommentsForArticle(commentData.articleId);
-    } catch (error) {
-      console.error('Ошибка добавления комментария:', error);
-    }
-  },
-  async updateComment() {
-    try {
-      await this.$store.dispatch('comment/updateComment', {
-        id: this.editingComment.id,
-        text: this.editingComment.text
-      });
-      await this.getCommentsForArticle(this.editingComment.id_article);
-      this.commentEditDialog = false;
-    } catch (error) {
-      console.error('Ошибка обновления комментария:', error);
     }
   }
 };

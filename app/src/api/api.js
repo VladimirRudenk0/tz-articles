@@ -82,7 +82,10 @@ export default {
 
   async createComment(comment) {
     try {
-      const response = await api.post('/comments', comment);
+      const response = await api.post('/comments/article', {
+        text: comment.text,
+        id_article: comment.id_article
+      });
       return response.data;
     } catch (error) {
       console.error('Error creating comment:', error);

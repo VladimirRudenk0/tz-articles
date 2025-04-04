@@ -23,6 +23,12 @@ export default {
     },
     SET_ERROR(state, error) {
       state.error = error;
+    },
+    ADD_COMMENT(state, { articleId, comment }) {
+      if (!state.commentsByArticle[articleId]) {
+        state.commentsByArticle[articleId] = [];
+      }
+      state.commentsByArticle[articleId].push(comment);
     }
   },
   actions: {
@@ -40,10 +46,14 @@ export default {
       }
     },
 
-    async addComment({ dispatch }, { articleId, comment }) {
+    async addComment({ commit }, { text, articleId }) {
       try {
-        await api.createComment({ ...comment, articleId });
-        await dispatch('getCommentsForArticle', articleId);
+        const comment = await api.createComment({
+          text,
+          id_article: articleId
+        });
+        commit('ADD_COMMENT', { articleId, comment });
+        return comment;
       } catch (error) {
         console.error('Failed to add comment:', error);
         throw error;
